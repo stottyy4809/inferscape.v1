@@ -1,0 +1,43 @@
+name: Daily AWS Price Fetcher
+
+on:
+  schedule:
+    # This runs it every day at 8:00 AM
+    - cron: '0 8 * * *' 
+  workflow_dispatch: 
+    # This adds a magic button so you can run it manually anytime
+
+jobs:
+  fetch-prices:
+    runs-on: ubuntu-latest
+    
+    # We need to give the robot permission to save the file back to the repo
+    permissions:
+      contents: write 
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Boto3
+        run: pip install boto3
+
+      - name: Run AWS Pricing Script
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: python test-aws.py
+
+      - name: Commit and Push pricing.json
+        run: |
+          git config --global user.name "Inferscape Auto-Bot"
+          git config --global user.email "action@github.com"
+          git add pricing.json
+          # If the prices haven't changed, this stops the robot from crashing
+          git commit -m "Auto-update AWS prices" || echo "No changes to commit"
+          git push
