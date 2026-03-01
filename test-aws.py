@@ -41,15 +41,35 @@ def get_instance_price(instance_name):
     except Exception:
         return "Error"
 
-# --- THE NEW PART: THE LIST & THE LOOP ---
+# --- THE NEW PART: SAVING TO JSON ---
+import json # Adding this just in case it isn't at the top of your file
 
-# 1. Create a list of all instances you want to check
-target_instances = ["g5.xlarge", "g5.2xlarge", "p4de.24xlarge", "p5.48xlarge"]
+# 1. The list of instances we want to track (mapped to GPU names)
+target_instances = {
+    "g5.xlarge": "A10",
+    "g5.2xlarge": "A10 (Large)",
+    "p4de.24xlarge": "A100",
+    "p5.48xlarge": "H100"
+}
 
-print(f"{'Instance':<15} | {'Price/hr (Frankfurt)':<20}")
-print("-" * 40)
+# 2. Create an empty dictionary to hold our results
+results_for_website = {}
 
-# 2. Loop through the list and call our function for each one
-for instance in target_instances:
-    price = get_instance_price(instance)
-    print(f"{instance:<15} | {price:<20}")
+print("Fetching prices from AWS...")
+
+# 3. Loop through the list and get prices
+for inst_id, gpu_name in target_instances.items():
+    price = get_instance_price(inst_id)
+    
+    # Organize the data for the website
+    results_for_website[inst_id] = {
+        "gpu": gpu_name,
+        "price": price
+    }
+    print(f"Got {inst_id}: {price}")
+
+# 4. THE MAGIC STEP: Save this dictionary as a JSON file
+with open('pricing.json', 'w') as f:
+    json.dump(results_for_website, f, indent=4)
+
+print("Success! pricing.json has been created.")
