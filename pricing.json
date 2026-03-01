@@ -1,0 +1,18 @@
+{
+    "g5.xlarge": {
+        "gpu": "A10",
+        "price": "$1.26"
+    },
+    "g5.2xlarge": {
+        "gpu": "A10 (Large)",
+        "price": "$1.52"
+    },
+    "p4de.24xlarge": {
+        "gpu": "A100",
+        "price": "$34.29"
+    },
+    "p5.48xlarge": {
+        "gpu": "H100",
+        "price": "N/A"
+    }
+}
